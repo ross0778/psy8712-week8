@@ -1,0 +1,18 @@
+---
+title: "PSY 8712 Week 8 Project"
+author: "Delaney Ross"
+output: html_document:
+  output_dir: out
+---
+
+# **Reproducible Image and Online Resources:**
+
+# **Script Settings and Resources**
+
+# **Data Import and Cleaning**
+
+# **Visualization**
+
+# **Analysis**
+
+# **Data Export**
