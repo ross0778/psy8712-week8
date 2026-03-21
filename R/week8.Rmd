@@ -1,17 +1,41 @@
 ---
 title: "PSY 8712 Week 8 Project"
 author: "Delaney Ross"
-output: html_document:
-  output_dir: out
+output:
+  html_document:
+    output_dir: out
 ---
 
 # **Reproducible Image and Online Resources:**
+An image of this project as of *`r Sys.Date()`* can be accessed by [clicking this link.](add in the mybinder.org link once project is finalized, make sure to add runtime.txt and install.R files)
+An interactive web app is available by [clicking this link instead.](add in the shiny app from Part 3 here)
 
 # **Script Settings and Resources**
+```{r script_settings, echo = TRUE, message = FALSE, warning = FALSE, results = 'hide'}
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+#load necessary libraries here
+library(tidyverse)
+```
 
 # **Data Import and Cleaning**
+This section imports and cleans the data file, converts times to POSIX format, converts condition and gender to factor, and reverse codes q5. I used mutate to make these conversions as it seemed the most efficient method and I subtracted q5 from the sum of the maximum and minimum of this question as it was the most straightforward way to reverse code the column.
+```{r data_import, echo = TRUE}
+week8_tbl <- read.csv("../data/week3.csv") %>% 
+  mutate(
+    timeStart = ymd_hms(timeStart),
+    timeEnd = ymd_hms(timeEnd),
+    condition = factor(condition,
+                       levels = c("A", "B", "C"),
+                       labels = c("Block A", "Block B", "Block C")),
+    gender = factor(gender,
+                    levels = c("M", "F"),
+                    labels = c("Male", "Female")),
+    q5 = (1 + 5) - q5
+  )
+```
 
 # **Visualization**
+This section displays the data from q1 through q6 as well as a scatterplot of the mean scores of q1 through q6 and the mean scores of q8 through q10. *Add why I did it this way once this section is done*
 
 # **Analysis**
 
