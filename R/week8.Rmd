@@ -13,12 +13,12 @@ An interactive web app is available by [clicking this link instead.](add in the 
 # **Script Settings and Resources**
 ```{r script_settings, echo = TRUE, message = FALSE, warning = FALSE, results = 'hide'}
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-#load necessary libraries here
 library(tidyverse)
+library(shiny)
 ```
 
 # **Data Import and Cleaning**
-This section imports and cleans the data file, converts times to POSIX format, converts condition and gender to factor, and reverse codes q5. I used mutate to make these conversions as it seemed the most efficient method and I subtracted q5 from the sum of the maximum and minimum of this question as it was the most straightforward way to reverse code the column.
+This section imports and cleans the data file, converts times to POSIX format, converts condition and gender to factor, reverse codes q5, and finds row means for following calculations. I used mutate to make these conversions as it seemed the most efficient method and I subtracted q5 from the sum of the maximum and minimum of this question as it was the most straightforward way to reverse code the column.
 ```{r data_import, echo = TRUE}
 week8_tbl <- read.csv("../data/week3.csv") %>% 
   mutate(
@@ -30,13 +30,33 @@ week8_tbl <- read.csv("../data/week3.csv") %>%
     gender = factor(gender,
                     levels = c("M", "F"),
                     labels = c("Male", "Female")),
-    q5 = (1 + 5) - q5
+    q5 = (1 + 5) - q5,
+    mq1q6 = rowMeans(pick(q1:q6)),
+    mq8q10 = rowMeans(pick(q8:q10))
   )
 ```
 
 # **Visualization**
-This section displays the data from q1 through q6 as well as a scatterplot of the mean scores of q1 through q6 and the mean scores of q8 through q10. *Add why I did it this way once this section is done*
-
+This section displays the data from q1 through q6 as well as a scatterplot of the mean scores of q1 through q6 and the mean scores of q8 through q10. I used select to display the data contained within q1-q6, geom_point to create the scatterplot, and geom_smooth() in order to create the regression line.
+```{r visualization, echo = FALSE, message = FALSE}
+week8_tbl %>% select(q1:q6)
+week8_tbl %>% 
+  ggplot(aes(x = mq1q6, y = mq8q10)) +
+  geom_point() +
+  geom_smooth(method = "lm", color = "purple")
+```
 # **Analysis**
+This section runs the correlation between the mean scores of q1 through q6 and the mean scores of q8 through q10. I used the sub() function in order to pattern match, used regex to identify the pattern, used "" to remove anything that matches "^0", and I used formatC in order to format the correlation.
+```{r analysis, echo = FALSE}
+mcor <- cor.test(week8_tbl$mq1q6, week8_tbl$mq8q10)
+mcor2 <- sub("^0", "", formatC(round(mcor$estimate, 2), format = "f", digits = 2))
+p_cor <- mcor$p.value
+```
+I observed a correlation of `r mcor2` between the mean scores of Q1-Q6 and the mean scores of Q8-Q10.The p-value was `r round(p_cor, 2)`, which `r ifelse(p_cor < .05, "is", "is not")` statistically significant at $\alpha = .05$, indicating that the relationship between the two scales `r ifelse(p_cor < .05, "is", "is not")` due to chance.
 
 # **Data Export**
+```{r data_export, echo = TRUE}
+week8_tbl %>% 
+  select(gender, timeEnd, mq1q6, mq8q10) %>% 
+  write.csv("../shiny/week8_shiny.csv", row.names = FALSE)
+```
