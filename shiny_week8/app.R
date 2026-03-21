@@ -1,45 +1,48 @@
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(shiny)
+library(tidyverse)
 
-shiny_tbl <- read.csv("week8_shiny.csv")
+shiny_tbl <- read.csv("week8_shiny.csv") %>% 
+  mutate(timeEnd = ymd_hms(timeEnd),
+         gender = factor(gender,
+                         levels = c("Male", "Female")))
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-
-    # Application title
-    titlePanel("Old Faithful Geyser Data"),
-
-    # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-        sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
-        ),
-
-        # Show a plot of the generated distribution
-        mainPanel(
-           plotOutput("distPlot")
-        )
-    )
+  # Dropdown to filter by gender; default "All" to show everyone initially
+  selectInput("gender", "Select Gender:",
+              choices = c("All", "Male", "Female"),
+              selected = "All"),
+  # Radio buttons to show or hide the error band; shown by default per instructions
+  radioButtons("error_band", "Error Band:",
+               choices = c("Display Error Band" = "display",
+                           "Suppress Error Band" = "suppress"),
+               selected = "display"),
+  # Checkbox to include participants before July 1 2017; included by default per instructions
+  checkboxInput("include_early", "Include participants before July 1, 2017", value = TRUE),
+  plotOutput("scatterplot")
 )
 
-# Define server logic required to draw a histogram
 server <- function(input, output) {
-
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white',
-             xlab = 'Waiting time to next eruption (in mins)',
-             main = 'Histogram of waiting times')
-    })
+  # Reactive dataset that refilters whenever any of the three inputs change
+  filter_tbl <- reactive({
+    tbl <- shiny_tbl
+    # Filter by gender only when a specific gender is chosen rather than All
+    if (input$gender != "All") tbl <- tbl %>% filter(gender == input$gender)
+    # Remove pre-July 2017 participants when checkbox is unchecked
+    if (!input$include_early) tbl <- tbl %>% filter(timeEnd >= ymd("2017-07-01"))
+    tbl
+  })
+  
+  output$scatterplot <- renderPlot({
+    # Build scatterplot using filtered data with purple OLS line matching the Rmd plot
+    filter_tbl() %>%
+      ggplot(aes(x = mq1q6, y = mq8q10)) +
+      geom_point() +
+      # se maps the radio button string to TRUE/FALSE to toggle the error band
+      geom_smooth(method = "lm", color = "purple",
+                  se = input$error_band == "display")
+  })
 }
 
-# Run the application 
-shinyApp(ui = ui, server = server)
+shinyApp(ui, server)
