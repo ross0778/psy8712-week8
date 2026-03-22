@@ -7,14 +7,13 @@ output:
 ---
 
 # **Reproducible Image and Online Resources:**
-An image of this project as of *`r Sys.Date()`* can be accessed by [clicking this link.](add in the mybinder.org link once project is finalized, make sure to add runtime.txt and install.R files)
-An interactive web app is available by [clicking this link instead.](add in the shiny app from Part 3 here)
+An image of this project as of *`r Sys.Date()`* can be accessed by [clicking this link.](https://mybinder.org/v2/gh/ross0778/psy8712-week8/HEAD)
+An interactive web app is available by [clicking this link instead.](https://8d76t4-delaney-ross.shinyapps.io/shiny_week8/)
 
 # **Script Settings and Resources**
 ```{r script_settings, echo = TRUE, message = FALSE, warning = FALSE, results = 'hide'}
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(tidyverse)
-library(shiny)
 ```
 
 # **Data Import and Cleaning**
@@ -45,6 +44,7 @@ week8_tbl %>%
   geom_point() +
   geom_smooth(method = "lm", color = "purple")
 ```
+
 # **Analysis**
 This section runs the correlation between the mean scores of q1 through q6 and the mean scores of q8 through q10. I used the sub() function in order to pattern match, used regex to identify the pattern, used "" to remove anything that matches "^0", and I used formatC in order to format the correlation.
 ```{r analysis, echo = FALSE}
@@ -58,5 +58,5 @@ I observed a correlation of `r mcor2` between the mean scores of Q1-Q6 and the m
 ```{r data_export, echo = TRUE}
 week8_tbl %>% 
   select(gender, timeEnd, mq1q6, mq8q10) %>% 
-  write.csv("../shiny/week8_shiny.csv", row.names = FALSE)
+  write.csv("../shiny_week8/week8_shiny.csv", row.names = FALSE)
 ```

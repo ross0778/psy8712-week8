@@ -4,7 +4,7 @@ library(tidyverse)
 #reads data and stores as a tibble
 shiny_tbl <- read.csv("week8_shiny.csv") %>% 
   mutate(
-    #converts timeEnd to POSIX
+    #converts timeEnd to POSIX format
     timeEnd = ymd_hms(timeEnd),
     #converts gender to a factor
          gender = factor(gender,
