@@ -1,0 +1,12 @@
+name: shiny_week8
+title: shiny_week8
+username: 8d76t4-delaney-ross
+account: 8d76t4-delaney-ross
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 16953491
+bundleId: 11742842
+url: https://8d76t4-delaney-ross.shinyapps.io/shiny_week8/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE

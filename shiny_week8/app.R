@@ -1,48 +1,58 @@
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(shiny)
 library(tidyverse)
 
+#reads data and stores as a tibble
 shiny_tbl <- read.csv("week8_shiny.csv") %>% 
-  mutate(timeEnd = ymd_hms(timeEnd),
+  mutate(
+    #converts timeEnd to POSIX
+    timeEnd = ymd_hms(timeEnd),
+    #converts gender to a factor
          gender = factor(gender,
                          levels = c("Male", "Female")))
 
-# Define UI for application that draws a histogram
 ui <- fluidPage(
-  # Dropdown to filter by gender; default "All" to show everyone initially
+  #makes dropdown menu with gender options, default All
   selectInput("gender", "Select Gender:",
+              #makes the choices for gender
               choices = c("All", "Male", "Female"),
+              #defaults to All
               selected = "All"),
-  # Radio buttons to show or hide the error band; shown by default per instructions
+  #creates the radio buttons for the error band display
   radioButtons("error_band", "Error Band:",
+               #displays names to user while telling shiny what to use
                choices = c("Display Error Band" = "display",
                            "Suppress Error Band" = "suppress"),
                selected = "display"),
-  # Checkbox to include participants before July 1 2017; included by default per instructions
+  #makes checkbox that allows users to include or exclude participants
   checkboxInput("include_early", "Include participants before July 1, 2017", value = TRUE),
+  #makes room in the UI for the scatterplot
   plotOutput("scatterplot")
 )
 
 server <- function(input, output) {
-  # Reactive dataset that refilters whenever any of the three inputs change
+  #used reactive() as it will rerun automatically when input changes
   filter_tbl <- reactive({
+    #provides full dataset prior to any filters
     tbl <- shiny_tbl
-    # Filter by gender only when a specific gender is chosen rather than All
+    #filter by gender only when a specific gender is selected
     if (input$gender != "All") tbl <- tbl %>% filter(gender == input$gender)
-    # Remove pre-July 2017 participants when checkbox is unchecked
+    #excludes rows from before 7/17 only when checkbox is unchecked
     if (!input$include_early) tbl <- tbl %>% filter(timeEnd >= ymd("2017-07-01"))
+    #returns the filtered tibble to be used by renderPlot
     tbl
   })
   
   output$scatterplot <- renderPlot({
-    # Build scatterplot using filtered data with purple OLS line matching the Rmd plot
+    #builds scatterplot using filtered data
     filter_tbl() %>%
+      #maps the x and y axes of scatterplot
       ggplot(aes(x = mq1q6, y = mq8q10)) +
       geom_point() +
-      # se maps the radio button string to TRUE/FALSE to toggle the error band
+      #adds the purple regression line
       geom_smooth(method = "lm", color = "purple",
+                  #converts radio string to a logical show/hide band
                   se = input$error_band == "display")
   })
 }
-
+#combines the ui and server objects to launch the Shiny app
 shinyApp(ui, server)
