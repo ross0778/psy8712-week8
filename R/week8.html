@@ -359,7 +359,8 @@ display: none;
 <h1><strong>Reproducible Image and Online Resources:</strong></h1>
 <p>An image of this project as of <em>2026-03-22</em> can be accessed by
 <a href="https://mybinder.org/v2/gh/ross0778/psy8712-week8/HEAD">clicking
-this link.</a> An interactive web app is available by <a href="https://8d76t4-delaney-ross.shinyapps.io/shiny_week8/">clicking
+this link.</a></p>
+<p>An interactive web app is available by <a href="https://8d76t4-delaney-ross.shinyapps.io/shiny_week8/">clicking
 this link instead.</a></p>
 </div>
 <div id="script-settings-and-resources" class="section level1">
@@ -456,6 +457,17 @@ through q6 and the mean scores of q8 through q10. I used the sub()
 function in order to pattern match, used regex to identify the pattern,
 used “” to remove anything that matches “^0”, and I used formatC in
 order to format the correlation.</p>
+<pre><code>## 
+##  Pearson&#39;s product-moment correlation
+## 
+## data:  week8_tbl$mq1q6 and week8_tbl$mq8q10
+## t = 0.58309, df = 47, p-value = 0.5626
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  -0.2012466  0.3574248
+## sample estimates:
+##        cor 
+## 0.08474575</code></pre>
 <p>I observed a correlation of .08 between the mean scores of Q1-Q6 and
 the mean scores of Q8-Q10.The p-value was 0.56, which is not
 statistically significant at <span class="math inline">\(\alpha =
@@ -464,6 +476,9 @@ not due to chance.</p>
 </div>
 <div id="data-export" class="section level1">
 <h1><strong>Data Export</strong></h1>
+<p>This section exports a minimal version of the dataset that is
+appropriate for shiny. I used select() in orer to select only the
+necessary variables and write.csv() to export the data.</p>
 <pre class="r"><code>week8_tbl %&gt;% 
   select(gender, timeEnd, mq1q6, mq8q10) %&gt;% 
   write.csv(&quot;../shiny_week8/week8_shiny.csv&quot;, row.names = FALSE)</code></pre>

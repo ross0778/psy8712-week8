@@ -8,6 +8,7 @@ output:
 
 # **Reproducible Image and Online Resources:**
 An image of this project as of *`r Sys.Date()`* can be accessed by [clicking this link.](https://mybinder.org/v2/gh/ross0778/psy8712-week8/HEAD)
+
 An interactive web app is available by [clicking this link instead.](https://8d76t4-delaney-ross.shinyapps.io/shiny_week8/)
 
 # **Script Settings and Resources**
@@ -51,10 +52,12 @@ This section runs the correlation between the mean scores of q1 through q6 and t
 mcor <- cor.test(week8_tbl$mq1q6, week8_tbl$mq8q10)
 mcor2 <- sub("^0", "", formatC(round(mcor$estimate, 2), format = "f", digits = 2))
 p_cor <- mcor$p.value
+mcor
 ```
 I observed a correlation of `r mcor2` between the mean scores of Q1-Q6 and the mean scores of Q8-Q10.The p-value was `r round(p_cor, 2)`, which `r ifelse(p_cor < .05, "is", "is not")` statistically significant at $\alpha = .05$, indicating that the relationship between the two scales `r ifelse(p_cor < .05, "is", "is not")` due to chance.
 
 # **Data Export**
+This section exports a minimal version of the dataset that is appropriate for shiny. I used select() in orer to select only the necessary variables and write.csv() to export the data.
 ```{r data_export, echo = TRUE}
 week8_tbl %>% 
   select(gender, timeEnd, mq1q6, mq8q10) %>% 
